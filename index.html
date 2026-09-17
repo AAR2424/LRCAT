@@ -10,7 +10,8 @@
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
 header{position:sticky;top:0;z-index:10;background:#10271d;padding:14px 14px 12px;border-bottom:1px solid var(--line)}
 h1{font-size:18px;margin:0 0 10px}
-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#0c1913;color:var(--text);font-size:16px}
+input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#0c1913;color:var(--text);font-size:16px}
+select{margin-top:8px}
 main{padding:12px;max-width:950px;margin:auto}
 #count{color:var(--muted);font-size:13px;margin:4px 2px 10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
@@ -62,8 +63,8 @@ function makeCard(r){
   const todo=val(r,['ko darīt','Ko darīt']);
   const advice=val(r,['ieteikums','Ieteikums']);
   const live=val(r,['live data','Live Data','Live data']);
-  const first=val(r,['sakotneja parbaude','sakotneja parbaude','sakotneja parbaude']);
-  const original=val(r,['original year range','Original year range','oriģinālais gadu diapazons']);
+  const first=val(r,['sakotneja parbaude','Sākotnējā pārbaude','First Checks']);
+  const original=val(r,['Sākotnējais kļūdas gadu diapazons','original year range','Original year range','oriģinālais gadu diapazons']);
   return `<div class="card" onclick="this.classList.toggle('open')">
     <div class="top"><div>
       <div class="dtc">${esc(dtc||'—')}</div>
@@ -78,8 +79,8 @@ function makeCard(r){
       ${todo?`<div class="row"><span class="label">Ko darīt:</span> ${esc(todo)}</div>`:''}
       ${advice?`<div class="row"><span class="label">Ieteikums:</span> ${esc(advice)}</div>`:''}
       ${live?`<div class="row"><span class="label">Live Data:</span> ${esc(live)}</div>`:''}
-      ${first?`<div class="row"><span class="label">sakotneja parbaude:</span> ${esc(first)}</div>`:''}
-      ${original?`<div class="row"><span class="label">Original year range:</span> ${esc(original)}</div>`:''}
+      ${first?`<div class="row"><span class="label">Sākotnējā pārbaude:</span> ${esc(first)}</div>`:''}
+      ${original?`<div class="row"><span class="label">Sākotnējais kļūdas gadu diapazons:</span> ${esc(original)}</div>`:''}
     </div>
   </div>`;
 }
