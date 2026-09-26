@@ -61,7 +61,7 @@ function makeCard(r){
  return `<div class="card" tabindex="0" role="button" aria-expanded="false"><div class="top"><div><div class="dtc">${esc(dtc||'—')}</div><div class="meta">${esc(model)}${code?' · '+esc(code):''}${r.gads?' · '+esc(r.gads):''}</div></div></div><div class="meaning">${esc(meaning)}</div><div class="details">${fields.filter(([,v])=>v).map(([label,value])=>`<div class="row"><span class="label">${esc(label)}:</span> ${esc(value)}</div>`).join('')}</div></div>`;
 }
 function render(){const t=UI[langSelect.value];document.documentElement.lang=langSelect.value;document.title=t.title;document.getElementById('site-title').textContent=t.title;q.placeholder=t.search;modelSelect.options[0].text=t.model;notice.textContent=t.notice;notice.hidden=!t.notice;
- const term=q.value.trim().toLocaleLowerCase();const language=langSelect.value;const filtered=DATA.filter(r=>(!modelSelect.value||r.Modelis===modelSelect.value)&&(!term||Object.values(r).some(v=>String(v).toLocaleLowerCase().includes(term))||Object.values(VERIFIED_TRANSLATIONS[r['kļūda']]?.[language]||{}).some(v=>String(v).toLocaleLowerCase().includes(term))));
+ const term=q.value.trim().toLocaleLowerCase();const filtered=DATA.filter(r=>(!modelSelect.value||r.Modelis===modelSelect.value)&&(!term||Object.values(r).some(v=>String(v).toLocaleLowerCase().includes(term))));
  count.textContent=`${filtered.length} ${t.found}${filtered.length>100?' · '+t.first100:''}`;results.innerHTML=filtered.length?filtered.slice(0,100).map(makeCard).join(''):`<div class="empty">${esc(t.empty)}</div>`;
 }
 results.addEventListener('click',e=>{const card=e.target.closest('.card');if(card){card.classList.toggle('open');card.setAttribute('aria-expanded',String(card.classList.contains('open')));}});
