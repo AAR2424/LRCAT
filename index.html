@@ -59,7 +59,7 @@ main{padding:12px;max-width:950px;margin:auto}
   <section id="coverage" aria-live="polite"></section>
   <select id="audit-filter" aria-label="Data coverage filter"><option value="all">Visi ieraksti</option><option value="missing-live">Bez sākotnējā Live Data lauka</option><option value="missing-first">Bez sākotnējās pārbaudes lauka</option><option value="both">Trūkst abi lauki</option><option value="source-live">Ar sākotnējo Live Data lauku</option></select>
   <div id="count"></div>
-   <div class="tools"><button id="export-csv" type="button">Eksportēt CSV</button><button id="export-json" type="button">Eksportēt JSON</button><button id="clear-filters" type="button">Notīrīt filtrus</button></div>
+   <div class="tools"><button id="export-csv" type="button">Eksportēt CSV</button><button id="export-json" type="button">Eksportēt JSON</button><button id="copy-dtc-list" type="button">Kopēt DTC sarakstu</button><button id="clear-filters" type="button">Notīrīt filtrus</button></div>
   <div id="results"></div>
   <button id="more" type="button" hidden></button>
 </main>
@@ -114,9 +114,9 @@ const translationKeys=['ko nozīmē','cēloņi','ko darīt','ieteikums','live da
 function translationStats(){const codes=[...new Set(DATA.map(r=>r['kļūda']))];return Object.fromEntries(['en','ru','fr','es'].map(l=>[l,codes.filter(c=>translationKeys.every(k=>!!VERIFIED_TRANSLATIONS[c]?.[l]?.[k])).length]));}
 const translationStatus=document.createElement('div');translationStatus.id='translation-status';translationStatus.style.cssText='padding:10px;margin:8px 0;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.5';
 document.getElementById('coverage').insertAdjacentElement('afterend',translationStatus);
-const versionTag=document.createElement('div');versionTag.style.cssText='font-size:12px;color:var(--muted);margin:4px 0 10px';versionTag.textContent='LRCAT 5.0 · DTC koda kopēšana · 2026-10-22';translationStatus.insertAdjacentElement('afterend',versionTag);
+const versionTag=document.createElement('div');versionTag.style.cssText='font-size:12px;color:var(--muted);margin:4px 0 10px';versionTag.textContent='LRCAT 5.1 · Filtrēto DTC saraksta kopēšana · 2026-10-23';translationStatus.insertAdjacentElement('afterend',versionTag);
 const stats=translationStats();
-const auditReport={version:'4.8',records:DATA.length,uniqueDTC:new Set(DATA.map(r=>r['kļūda'])).size,translations:stats,duplicateExactRecords:DATA.length-new Set(DATA.map(r=>JSON.stringify(r))).size};
+const auditReport={version:'5.1',records:DATA.length,uniqueDTC:new Set(DATA.map(r=>r['kļūda'])).size,translations:stats,duplicateExactRecords:DATA.length-new Set(DATA.map(r=>JSON.stringify(r))).size};
 console.info('LRCAT datu pārbaude',auditReport);function updateTranslationStatus(){
  const label={lv:'Pilns 6 diagnostikas lauku tulkojums (unikālie DTC)',en:'Complete translation of 6 diagnostic fields (unique DTCs)',ru:'Полный перевод 6 диагностических полей (уникальные DTC)',fr:'Traduction complète des 6 champs de diagnostic (DTC distincts)',es:'Traducción completa de los 6 campos de diagnóstico (DTC únicos)'}[langSelect.value];
  const note={lv:'Trūkstošie tulkojumi tiek rādīti latviski ar atzīmi [LV].',en:'Missing translations are shown in Latvian with an [LV] marker.',ru:'Отсутствующие переводы показываются на латышском с меткой [LV].',fr:'Les traductions manquantes s’affichent en letton avec la mention [LV].',es:'Las traducciones ausentes se muestran en letón con la marca [LV].'}[langSelect.value];
@@ -138,8 +138,18 @@ function render(reset=true){
  more.hidden=visible>=currentFiltered.length;more.textContent=t.more;
 }
 const actionLabels={lv:['Eksportēt CSV','Eksportēt JSON','Notīrīt filtrus'],en:['Export CSV','Export JSON','Clear filters'],ru:['Экспорт CSV','Экспорт JSON','Сбросить фильтры'],fr:['Exporter CSV','Exporter JSON','Effacer les filtres'],es:['Exportar CSV','Exportar JSON','Borrar filtros']};
-const exactLabels={lv:'Meklēt tikai precīzu DTC kodu',en:'Match exact DTC code only',ru:'Только точное совпадение кода DTC',fr:'Code DTC exact uniquement',es:'Solo coincidencia exacta del código DTC'};function setActionLabels(){document.getElementById('exact-text').textContent=exactLabels[langSelect.value];['export-csv','export-json','clear-filters'].forEach((id,i)=>document.getElementById(id).textContent=actionLabels[langSelect.value][i]);}
-function saveFile(content,type,extension){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_5_0_filtered_'+new Date().toISOString().slice(0,10)+'.'+extension;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+const exactLabels={lv:'Meklēt tikai precīzu DTC kodu',en:'Match exact DTC code only',ru:'Только точное совпадение кода DTC',fr:'Code DTC exact uniquement',es:'Solo coincidencia exacta del código DTC'};function setActionLabels(){updateListCopyLabel();document.getElementById('exact-text').textContent=exactLabels[langSelect.value];['export-csv','export-json','clear-filters'].forEach((id,i)=>document.getElementById(id).textContent=actionLabels[langSelect.value][i]);}
+function saveFile(content,type,extension){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_5_1_filtered_'+new Date().toISOString().slice(0,10)+'.'+extension;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+const listCopyLabels={lv:['Kopēt DTC sarakstu','Nokopēti','Nav DTC kodu','Neizdevās kopēt'],en:['Copy DTC list','Copied','No DTC codes','Copy failed'],ru:['Копировать список DTC','Скопировано','Нет кодов DTC','Ошибка копирования'],fr:['Copier la liste DTC','Copié','Aucun code DTC','Échec de la copie'],es:['Copiar lista DTC','Copiado','Sin códigos DTC','Error al copiar']};
+const listCopyButton=document.getElementById('copy-dtc-list');
+function updateListCopyLabel(){listCopyButton.textContent=listCopyLabels[langSelect.value][0];}
+listCopyButton.addEventListener('click',async()=>{
+ const codes=[...new Set(currentFiltered.map(r=>String(r['kļūda']||'').trim()).filter(Boolean))].sort();
+ const labels=listCopyLabels[langSelect.value];
+ if(!codes.length){listCopyButton.textContent=labels[2];return;}
+ try{await copyText(codes.join('\n'));listCopyButton.textContent=labels[1]+' ('+codes.length+')';}
+ catch(err){listCopyButton.textContent=labels[3];}
+});
 document.getElementById('export-json').addEventListener('click',()=>saveFile(JSON.stringify(currentFiltered,null,2),'application/json;charset=utf-8','json'));
 document.getElementById('export-csv').addEventListener('click',()=>{const keys=Object.keys(DATA[0]);const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv='\ufeff'+[keys.map(quote).join(';'),...currentFiltered.map(r=>keys.map(k=>quote(r[k])).join(';'))].join('\r\n');saveFile(csv,'text/csv;charset=utf-8','csv');});
 document.getElementById('clear-filters').addEventListener('click',()=>{q.value='';document.getElementById('exact-dtc').checked=false;modelSelect.value='';document.getElementById('audit-filter').value='all';render();});
