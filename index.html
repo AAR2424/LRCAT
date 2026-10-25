@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LRCAT 7.0 — Land Rover diagnostikas kļūdu katalogs</title>
+<title>LRCAT 7.1 — Land Rover diagnostikas kļūdu katalogs</title>
 <style>
 :root{--bg:#0f1f18;--card:#173126;--card2:#1d3c2f;--text:#f4f7f5;--muted:#b7c7bd;--accent:#8fd3a9;--line:#2c5441}
 *{box-sizing:border-box}
@@ -52,7 +52,7 @@ main{padding:12px;max-width:950px;margin:auto}
 }
 .dtc-state-label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin:4px 0}.dtc-state{max-width:170px;padding:6px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:inherit}@media print{.dtc-state-label{display:none}}
 
-/* LRCAT 7.0 — report preview */
+/* LRCAT 7.1 — report preview */
 #report-preview[hidden]{display:none!important}
 #report-preview{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.83);display:flex;flex-direction:column;padding:12px;gap:10px}
 #preview-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:#173126;padding:10px;border-radius:10px}
@@ -98,6 +98,7 @@ main{padding:12px;max-width:950px;margin:auto}
 <section id="report-history-panel" style="margin:12px 0;padding:13px;border:1px solid #50b4b3;border-radius:9px" aria-label="Report history">
  <strong id="history-title">Atskaišu vēsture šajā pārlūkā</strong>
  <p id="history-hint" style="font-size:13px;opacity:.85">Atskaites tiek saglabātas tikai šajā ierīcē pēc jūsu izvēles. Tās var saturēt klienta un VIN datus. Izmantojot koplietotu datoru, dzēsiet vēsturi.</p>
+ <div style="margin:10px 0"><label for="history-search" id="history-search-label">Meklēt saglabātās atskaites</label> <input id="history-search" type="search" autocomplete="off" placeholder="Atskaites numurs, VIN, DTC…" style="width:min(100%,420px);padding:8px" /> <span id="history-search-count" aria-live="polite"></span></div>
  <div class="tools"><button type="button" id="history-clear">Dzēst visu vēsturi</button></div>
  <div id="history-list" aria-live="polite"></div>
 </section>
@@ -142,7 +143,7 @@ function diagnosticSummary(r){
  const lang=langSelect.value,h=reportHeaders[lang],code=String(r['kļūda']||'');
  const values=[code,r.Modelis||'',r['Modeļa kods']||'',r.gads||'',r['dzinējs']||'',translated(r,'ko nozīmē'),translated(r,'cēloņi'),translated(r,'ko darīt'),translated(r,'ieteikums'),translated(r,'live data'),translated(r,'sakotneja parbaude')];
  const disclaimer={lv:'Informatīvs katalogs; pārbaudi procedūras ražotāja dokumentācijā.',en:'Informational catalog; verify procedures against manufacturer documentation.',ru:'Справочный каталог; сверяйте процедуры с документацией производителя.',fr:'Catalogue informatif ; vérifier les procédures dans la documentation du constructeur.',es:'Catálogo informativo; verifica los procedimientos con la documentación del fabricante.'}[lang];
- return 'LRCAT 7.0\n'+h.map((label,i)=>label+': '+String(values[i]||'—')).join('\n')+'\n\n'+disclaimer;
+ return 'LRCAT 7.1\n'+h.map((label,i)=>label+': '+String(values[i]||'—')).join('\n')+'\n\n'+disclaimer;
 }
 async function copyText(text){if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return;}const field=document.createElement('textarea');field.value=text;field.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(field);try{field.select();if(!document.execCommand('copy'))throw new Error('Copy unsupported');}finally{field.remove();}}
 const copyLabels={lv:'Kopēt kodu',en:'Copy code',ru:'Копировать код',fr:'Copier le code',es:'Copiar código'};
@@ -152,11 +153,11 @@ function printDiagnosticReport(r){
  const values=[r['kļūda']||'',r.Modelis||'',r['Modeļa kods']||'',r.gads||'',r['dzinējs']||'',translated(r,'ko nozīmē'),translated(r,'cēloņi'),translated(r,'ko darīt'),translated(r,'ieteikums'),translated(r,'live data'),translated(r,'sakotneja parbaude')];
  const disclaimer={lv:'Informatīvs katalogs, nevis ražotāja apstiprināta remonta procedūra. Pārbaudi norādes JLR TOPIx.',en:'Informational catalog, not an OEM-approved repair procedure. Verify against JLR TOPIx.',ru:'Справочный каталог, не утверждённая производителем процедура. Сверяйте с JLR TOPIx.',fr:'Catalogue informatif, pas une procédure approuvée par le constructeur. Vérifiez dans JLR TOPIx.',es:'Catálogo informativo, no un procedimiento aprobado por el fabricante. Compruebe en JLR TOPIx.'}[lang];
  const report=document.getElementById('print-report');
- report.innerHTML='<h1>LRCAT 7.0</h1>'+reportInfoHtml()+'<h2>'+esc(String(values[0]))+'</h2>'+dtcStatusPrint(String(values[0]))+h.slice(1).map((label,i)=>'<div class="print-row"><span class="print-label">'+esc(label)+':</span> '+esc(String(values[i+1]||'—'))+'</div>').join('')+'<div class="print-disclaimer">'+esc(disclaimer)+'</div>';
+ report.innerHTML='<h1>LRCAT 7.1</h1>'+reportInfoHtml()+'<h2>'+esc(String(values[0]))+'</h2>'+dtcStatusPrint(String(values[0]))+h.slice(1).map((label,i)=>'<div class="print-row"><span class="print-label">'+esc(label)+':</span> '+esc(String(values[i+1]||'—'))+'</div>').join('')+'<div class="print-disclaimer">'+esc(disclaimer)+'</div>';
  showReportPreview();
 }
 
-// LRCAT 7.0 — DTC-specific statuses are session-only and keyed by the full DTC (including suffix).
+// LRCAT 7.1 — DTC-specific statuses are session-only and keyed by the full DTC (including suffix).
 const dtcStatus=new Map();
 const dtcStateValues=['active','history','resolved'];
 const dtcStateLabels={
@@ -185,7 +186,7 @@ const translationKeys=['ko nozīmē','cēloņi','ko darīt','ieteikums','live da
 function translationStats(){const codes=[...new Set(DATA.map(r=>r['kļūda']))];return Object.fromEntries(['en','ru','fr','es'].map(l=>[l,codes.filter(c=>translationKeys.every(k=>!!VERIFIED_TRANSLATIONS[c]?.[l]?.[k])).length]));}
 const translationStatus=document.createElement('div');translationStatus.id='translation-status';translationStatus.style.cssText='padding:10px;margin:8px 0;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.5';
 document.getElementById('coverage').insertAdjacentElement('afterend',translationStatus);
-const versionTag=document.createElement('div');versionTag.style.cssText='font-size:12px;color:var(--muted);margin:4px 0 10px';versionTag.textContent='LRCAT 7.0 · Vairāku DTC meklēšana · 2026-10-23';translationStatus.insertAdjacentElement('afterend',versionTag);
+const versionTag=document.createElement('div');versionTag.style.cssText='font-size:12px;color:var(--muted);margin:4px 0 10px';versionTag.textContent='LRCAT 7.1 · Vairāku DTC meklēšana · 2026-10-23';translationStatus.insertAdjacentElement('afterend',versionTag);
 const stats=translationStats();
 const auditReport={version:'6.0',records:DATA.length,uniqueDTC:new Set(DATA.map(r=>r['kļūda'])).size,translations:stats,duplicateExactRecords:DATA.length-new Set(DATA.map(r=>JSON.stringify(r))).size};
 console.info('LRCAT datu pārbaude',auditReport);function updateTranslationStatus(){
@@ -196,7 +197,7 @@ console.info('LRCAT datu pārbaude',auditReport);function updateTranslationStatu
 updateTranslationStatus();
 
 
-// LRCAT 7.0 — multiple DTC search and consolidated report; exact full codes including -xx subtype.
+// LRCAT 7.1 — multiple DTC search and consolidated report; exact full codes including -xx subtype.
 let activeMultiCodes=null;
 const multiInput=document.getElementById('multi-dtc-input');
 const multiFeedback=document.getElementById('multi-dtc-feedback');
@@ -253,7 +254,7 @@ results.addEventListener('click',async e=>{const print=e.target.closest('.print-
 results.addEventListener('keydown',e=>{if(e.target.matches('.dtc-state'))return;if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('card')){e.preventDefault();e.target.click();}});
 q.addEventListener('input',render);document.getElementById('exact-dtc').addEventListener('change',render);modelSelect.addEventListener('change',render);langSelect.addEventListener('change',()=>{setActionLabels();const options={lv:['Visi ieraksti','Bez sākotnējā Live Data lauka','Bez sākotnējās pārbaudes lauka','Trūkst abi lauki','Ar sākotnējo Live Data lauku'],en:['All records','Missing source Live Data','Missing source initial check','Both fields missing','Has source Live Data'],ru:['Все записи','Нет исходных Live Data','Нет исходной первичной проверки','Оба поля отсутствуют','Есть исходные Live Data'],fr:['Toutes les entrées','Sans Live Data source','Sans contrôle initial source','Deux champs absents','Avec Live Data source'],es:['Todos los registros','Sin Live Data original','Sin comprobación inicial original','Faltan ambos campos','Con Live Data original']}[langSelect.value];[...document.getElementById('audit-filter').options].forEach((o,i)=>o.textContent=options[i]);render();});setActionLabels();render();
 
-// LRCAT 7.0 — consolidated print/PDF report for the currently filtered DTCs.
+// LRCAT 7.1 — consolidated print/PDF report for the currently filtered DTCs.
 const multiPrintLabels={lv:'Kopīga atskaite / PDF',en:'Combined report / PDF',ru:'Общий отчёт / PDF',fr:'Rapport groupé / PDF',es:'Informe conjunto / PDF'};
 const multiPrintMeta={lv:['Kopīga diagnostikas atskaite','Izveidots','Atlasīti ieraksti','Unikāli DTC','Nav atlasītu ierakstu','Informatīvs katalogs. Pārbaudi procedūras ražotāja JLR TOPIx dokumentācijā.'],en:['Combined diagnostic report','Created','Selected records','Unique DTCs','No selected records','Informational catalog. Verify procedures against manufacturer JLR TOPIx documentation.'],ru:['Сводный диагностический отчёт','Создан','Выбрано записей','Уникальных DTC','Нет выбранных записей','Справочный каталог. Сверяйте процедуры с документацией JLR TOPIx.'],fr:['Rapport de diagnostic groupé','Créé le','Enregistrements sélectionnés','DTC uniques','Aucun enregistrement sélectionné','Catalogue informatif. Vérifiez les procédures dans la documentation JLR TOPIx.'],es:['Informe de diagnóstico conjunto','Creado','Registros seleccionados','DTC únicos','No hay registros seleccionados','Catálogo informativo. Verifique los procedimientos en la documentación JLR TOPIx.']};
 function printCombinedReport(){
@@ -266,7 +267,7 @@ function printCombinedReport(){
   const vals=[r['kļūda']||'',r.Modelis||'',r['Modeļa kods']||'',r.gads||'',r['dzinējs']||'',translated(r,'ko nozīmē'),translated(r,'cēloņi'),translated(r,'ko darīt'),translated(r,'ieteikums'),translated(r,'live data'),translated(r,'sakotneja parbaude')];
   return '<article class="combined-entry"><h2>'+(i+1)+'. '+esc(String(vals[0]))+'</h2>'+dtcStatusPrint(String(vals[0]))+headers.slice(1).map((h,j)=>'<div class="print-row"><span class="print-label">'+esc(h)+':</span> '+esc(String(vals[j+1]||'—'))+'</div>').join('')+'</article>';
  }).join('');
- report.innerHTML='<h1>LRCAT 7.0 — '+esc(labels[0])+'</h1><div class="print-row">'+esc(labels[1])+': '+esc(date)+'</div><div class="print-row">'+esc(labels[2])+': '+records.length+' · '+esc(labels[3])+': '+unique.length+'</div><div class="print-row"><strong>DTC:</strong> '+esc(unique.join(', '))+'</div>'+reportInfoHtml()+rows+'<p class="print-disclaimer">'+esc(labels[5])+'</p>';
+ report.innerHTML='<h1>LRCAT 7.1 — '+esc(labels[0])+'</h1><div class="print-row">'+esc(labels[1])+': '+esc(date)+'</div><div class="print-row">'+esc(labels[2])+': '+records.length+' · '+esc(labels[3])+': '+unique.length+'</div><div class="print-row"><strong>DTC:</strong> '+esc(unique.join(', '))+'</div>'+reportInfoHtml()+rows+'<p class="print-disclaimer">'+esc(labels[5])+'</p>';
  showReportPreview();
 }
 
@@ -330,7 +331,7 @@ updateCombinedButton();
 langSelect.addEventListener('change',updateCombinedButton);
 
 
-// LRCAT 7.0 — opt-in local JSON export/import, no automatic storage.
+// LRCAT 7.1 — opt-in local JSON export/import, no automatic storage.
 const sessionFields=['report-number','report-date','report-vin','report-plate','report-mileage','report-technician','report-notes','report-client','report-service','report-phone','report-email','report-recommendations','report-status'];
 const sessionText={
  lv:['Diagnostikas sesija','Saglabā ievadītos datus JSON failā un atjauno tos vēlāk. Dati netiek sūtīti serverim.','Saglabāt sesiju (JSON)','Atjaunot sesiju','Sesija saglabāta failā.','Sesija atjaunota.','Neizdevās atjaunot: nederīgs vai neatbalstīts fails.'],
@@ -375,7 +376,7 @@ document.getElementById('session-file').addEventListener('change',e=>loadSession
 langSelect.addEventListener('change',sessionLabels);sessionLabels();
 
 
-// LRCAT 7.0 — snapshots are manual and refer only to selected DTC codes.
+// LRCAT 7.1 — snapshots are manual and refer only to selected DTC codes.
 let comparisonBefore=null,comparisonAfter=null;
 const comparisonLabels={
  lv:['Pirms / pēc remonta','Fiksē atlasīto DTC statusus pirms un pēc remonta. Šis nav skenera automātisks mērījums.','Fiksēt PIRMS','Fiksēt PĒC','Drukāt salīdzinājumu / PDF','Notīrīt salīdzinājumu','Pirms','Pēc','Nav fiksēts','Kods','Statuss','Izmaiņa','Jauns pēc remonta','Vairs nav atlasē','Statuss mainīts','Bez izmaiņām','Nav atlasītu DTC. Vispirms izmanto meklēšanu vai vairāku kodu ievadi.','Salīdzināšanai vispirms fiksē PIRMS un PĒC.','Pirms / pēc remonta atskaite','DTC statusi ir lietotāja norādīti, nevis automātiski nolasīti no transportlīdzekļa.'],
@@ -396,7 +397,7 @@ function captureComparison(){
  if(!codes.length){alert(comparisonLabels[langSelect.value][16]);return null;}
  return {time:new Date().toISOString(),codes:codes.map(code=>({code,status:dtcStatus.get(code)||'active'}))};
 }
-// LRCAT 7.0 — show only changed/new/missing DTCs when requested.
+// LRCAT 7.1 — show only changed/new/missing DTCs when requested.
 let comparisonChangesOnly=false;
 const comparisonFilterLabels={
  lv:'Rādīt tikai izmaiņas',en:'Show changes only',ru:'Показать только изменения',fr:'Afficher uniquement les changements',es:'Mostrar solo cambios'
@@ -449,11 +450,11 @@ document.getElementById('comparison-clear').addEventListener('click',()=>{compar
 document.getElementById('comparison-print').addEventListener('click',()=>{
  const l=comparisonLabels[langSelect.value];if(!comparisonBefore||!comparisonAfter){alert(l[17]);return;}
  const rows=visibleComparisonRows().map(r=>'<tr><td>'+esc(r.code)+'</td><td>'+esc(comparisonStatus(r.b))+'</td><td>'+esc(comparisonStatus(r.a))+'</td><td>'+esc(!r.b?l[12]:!r.a?l[13]:r.b!==r.a?l[14]:l[15])+'</td></tr>').join('');
- document.getElementById('print-report').innerHTML='<h1>LRCAT 7.0 — '+esc(l[18])+'</h1>'+reportInfoHtml()+'<p>'+esc(l[6])+': '+esc(comparisonBefore.time)+' · '+esc(l[7])+': '+esc(comparisonAfter.time)+'</p><table style="width:100%;border-collapse:collapse" border="1" cellpadding="7"><thead><tr>'+[l[9],l[6],l[7],l[11]].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table>'+comparisonSummaryHtml()+'<p>'+esc(l[19])+'</p>';
+ document.getElementById('print-report').innerHTML='<h1>LRCAT 7.1 — '+esc(l[18])+'</h1>'+reportInfoHtml()+'<p>'+esc(l[6])+': '+esc(comparisonBefore.time)+' · '+esc(l[7])+': '+esc(comparisonAfter.time)+'</p><table style="width:100%;border-collapse:collapse" border="1" cellpadding="7"><thead><tr>'+[l[9],l[6],l[7],l[11]].map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table>'+comparisonSummaryHtml()+'<p>'+esc(l[19])+'</p>';
  showReportPreview();
 });
 
-// LRCAT 7.0 — export only comparison data, not client or vehicle details.
+// LRCAT 7.1 — export only comparison data, not client or vehicle details.
 const comparisonCsvLabels={
  lv:'Eksportēt salīdzinājumu CSV',en:'Export comparison CSV',ru:'Экспорт сравнения CSV',fr:'Exporter la comparaison CSV',es:'Exportar comparación CSV'
 };
@@ -478,7 +479,7 @@ document.getElementById('comparison-csv').addEventListener('click',()=>{
 langSelect.addEventListener('change',updateComparison);updateComparison();
 
 
-// LRCAT 7.0 — preview all three report types before invoking the browser print dialog.
+// LRCAT 7.1 — preview all three report types before invoking the browser print dialog.
 const previewText={lv:['Atskaites priekšskatījums','Drukāt / Saglabāt PDF','Aizvērt'],en:['Report preview','Print / Save PDF','Close'],ru:['Предпросмотр отчёта','Печать / Сохранить PDF','Закрыть'],fr:['Aperçu du rapport','Imprimer / Enregistrer PDF','Fermer'],es:['Vista previa del informe','Imprimir / Guardar PDF','Cerrar']};
 const previewModal=document.getElementById('report-preview');
 let previewReturnFocus=null;
@@ -502,14 +503,14 @@ function closeReportPreview(){previewModal.hidden=true;document.body.style.overf
 document.getElementById('preview-close').addEventListener('click',closeReportPreview);
 document.getElementById('preview-print').addEventListener('click',()=>{closeReportPreview();window.print();});
 
-// LRCAT 7.0 — export a self-contained, printable HTML report; never upload private details.
+// LRCAT 7.1 — export a self-contained, printable HTML report; never upload private details.
 const previewSaveLabels={lv:['Saglabāt HTML','Atskaitē var būt klienta un VIN dati. Glabā failu droši.'],en:['Save HTML','This report may contain client and VIN details. Store it securely.'],ru:['Сохранить HTML','Отчёт может содержать данные клиента и VIN. Храните файл безопасно.'],fr:['Enregistrer HTML','Ce rapport peut contenir des données client et VIN. Conservez-le en sécurité.'],es:['Guardar HTML','El informe puede contener datos del cliente y VIN. Guárdelo de forma segura.']};
 function saveReportHtml(){
  const report=document.getElementById('print-report');
  if(!report.innerHTML.trim())return;
  const labels=previewSaveLabels[langSelect.value]||previewSaveLabels.lv;
  if(!window.confirm(labels[1]))return;
- const title='LRCAT 7.0 — '+(document.getElementById('report-number')?.value.trim()||'diagnostikas_atskaite');
+ const title='LRCAT 7.1 — '+(document.getElementById('report-number')?.value.trim()||'diagnostikas_atskaite');
  const html='<!doctype html><html lang="'+(langSelect.value||'lv')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+esc(title)+'</title><style>@page{size:A4;margin:16mm}body{max-width:850px;margin:25px auto;padding:20px;color:#111;background:white;font:14px/1.5 Arial,sans-serif}h1{font-size:24px}h2{font-size:19px}.print-row{padding:6px 0;border-bottom:1px solid #ddd;overflow-wrap:anywhere}.print-label{font-weight:bold}.combined-entry{border-top:1px solid #aaa;margin-top:22px;padding-top:12px;break-inside:avoid-page}.print-disclaimer{border-top:1px solid #888;margin-top:22px;padding-top:12px;font-size:12px}.print-recommendations{border-top:1px solid #aaa;margin-top:12px;padding-top:8px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px;text-align:left}@media print{body{margin:0;padding:0}}</style></head><body>'+report.innerHTML+'</body></html>';
  const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='LRCAT_7_0_atskaite_'+new Date().toISOString().slice(0,10)+'.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -517,7 +518,7 @@ function saveReportHtml(){
 document.getElementById('preview-save-html').addEventListener('click',saveReportHtml);
 
 
-// LRCAT 7.0 — copy the currently displayed report as readable plain text.
+// LRCAT 7.1 — copy the currently displayed report as readable plain text.
 const previewCopyLabels={
  lv:['Kopēt atskaites tekstu','Atskaitē var būt klienta un VIN dati. Vai kopēt tos starpliktuvē?','Atskaites teksts nokopēts.','Neizdevās kopēt. Iezīmē tekstu priekšskatījumā un kopē manuāli.'],
  en:['Copy report text','The report may contain client and VIN details. Copy them to the clipboard?','Report text copied.','Copy failed. Select the preview text and copy it manually.'],
@@ -542,7 +543,7 @@ async function copyPreviewReportText(){
 }
 document.getElementById('preview-copy-text').addEventListener('click',copyPreviewReportText);
 
-// LRCAT 7.0 — export the previewed report as a UTF-8 plain-text document.
+// LRCAT 7.1 — export the previewed report as a UTF-8 plain-text document.
 const previewTxtLabels={
  lv:['Saglabāt TXT','Atskaitē var būt klienta un VIN dati. Vai saglabāt teksta failu?'],
  en:['Save TXT','The report may contain client and VIN details. Save the text file?'],
@@ -567,7 +568,7 @@ document.getElementById('preview-save-txt').addEventListener('click',savePreview
 previewModal.addEventListener('click',e=>{if(e.target===previewModal)closeReportPreview();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!previewModal.hidden)closeReportPreview();});
 
-// LRCAT 7.0 — opt-in local report history, max 15 entries, no network transmission.
+// LRCAT 7.1 — searchable opt-in local report history, max 15 entries, no network transmission.
 const HISTORY_KEY='LRCAT_7_0_REPORT_HISTORY';
 const historyI18n={
  lv:['Atskaišu vēsture šajā pārlūkā','Atskaites tiek glabātas tikai šajā pārlūkā pēc jūsu izvēles. Tajās var būt klienta un VIN dati.','Saglabāt vēsturē','Dzēst visu vēsturi','Atvērt','Dzēst','Vēsture ir tukša.','Vai saglabāt atskaiti šīs ierīces pārlūkā? Tajā var būt personas dati.','Atskaite saglabāta.','Neizdevās saglabāt. Pārbaudiet pārlūka atmiņas iestatījumus.','Vai dzēst šo atskaiti?','Vai neatgriezeniski dzēst visas saglabātās atskaites?','Vēsturē saglabātā atskaite','Atskaites vēsture nav pieejama šajā pārlūkā.'],
@@ -579,11 +580,23 @@ const historyI18n={
 function hText(){return historyI18n[langSelect.value]||historyI18n.lv;}
 function readHistory(){try{const x=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');return Array.isArray(x)?x.filter(v=>v&&typeof v.html==='string'&&typeof v.id==='string').slice(0,15):[];}catch(e){return [];}}
 function writeHistory(items){localStorage.setItem(HISTORY_KEY,JSON.stringify(items.slice(0,15)));}
+const historySearchI18n={
+ lv:['Meklēt saglabātās atskaites','Atskaites numurs, VIN, DTC…','Nav atbilstošu atskaišu.','Atrastas:'],
+ en:['Search saved reports','Report number, VIN, DTC…','No matching reports.','Found:'],
+ ru:['Поиск сохранённых отчётов','Номер отчёта, VIN, DTC…','Нет подходящих отчётов.','Найдено:'],
+ fr:['Rechercher les rapports enregistrés','N° de rapport, VIN, DTC…','Aucun rapport correspondant.','Trouvés :'],
+ es:['Buscar informes guardados','N.º de informe, VIN, DTC…','No hay informes coincidentes.','Encontrados:']
+};
 function renderHistory(){
  const t=hText();document.getElementById('history-title').textContent=t[0];document.getElementById('history-hint').textContent=t[1];
  document.getElementById('preview-history-save').textContent=t[2];document.getElementById('history-clear').textContent=t[3];
- const list=document.getElementById('history-list');list.replaceChildren();const items=readHistory();
- if(!items.length){const p=document.createElement('p');p.textContent=t[6];list.appendChild(p);return;}
+ const ht=historySearchI18n[langSelect.value]||historySearchI18n.lv;
+ document.getElementById('history-search-label').textContent=ht[0];document.getElementById('history-search').placeholder=ht[1];
+ const list=document.getElementById('history-list');list.replaceChildren();const all=readHistory();
+ const query=document.getElementById('history-search').value.trim().toLocaleLowerCase();
+ const items=query?all.filter(item=>((item.label||'')+' '+(item.html||'').replace(/<[^>]*>/g,' ')).toLocaleLowerCase().includes(query)):all;
+ document.getElementById('history-search-count').textContent=query?' '+ht[3]+' '+items.length+'/'+all.length:'';
+ if(!items.length){const p=document.createElement('p');p.textContent=all.length?ht[2]:t[6];list.appendChild(p);return;}
  items.forEach(item=>{const wrap=document.createElement('div');wrap.style.cssText='padding:9px 0;border-top:1px solid #416450;display:flex;gap:8px;flex-wrap:wrap;align-items:center';
  const info=document.createElement('span');info.style.cssText='flex:1;min-width:170px;overflow-wrap:anywhere';info.textContent=(item.label||t[12])+' — '+new Date(item.savedAt).toLocaleString(langSelect.value||'lv');wrap.appendChild(info);
  const open=document.createElement('button');open.type='button';open.textContent=t[4];open.addEventListener('click',()=>{const report=document.getElementById('print-report');report.innerHTML=item.html;showReportPreview();});wrap.appendChild(open);
@@ -598,6 +611,7 @@ document.getElementById('preview-history-save').addEventListener('click',()=>{
  try{writeHistory([item,...readHistory()]);renderHistory();alert(t[8]);}catch(e){alert(t[9]);}
 });
 document.getElementById('history-clear').addEventListener('click',()=>{if(!confirm(hText()[11]))return;try{localStorage.removeItem(HISTORY_KEY);renderHistory();}catch(e){alert(hText()[9]);}});
+document.getElementById('history-search').addEventListener('input',renderHistory);
 langSelect.addEventListener('change',renderHistory);renderHistory();
 
 </script>
