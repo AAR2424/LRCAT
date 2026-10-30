@@ -1184,33 +1184,32 @@ updateHistoryFilterSummary();
 </script>
 
 <script>
-/* LRCAT 10.3 — isolated multi-DTC tools */
+/* DTC tools: isolated from report printing and legacy scripts */
 (function(){
 'use strict';
 const translations={
-lv:['Noņemt dublikātus','Kopēt DTC kodus','DTC TXT','Ielīmēt DTC kodus','Ievadīti','Unikālie','Starpliktuve nav pieejama; izmanto Ctrl+V.'],
-en:['Remove duplicates','Copy DTC codes','DTC TXT','Paste DTC codes','Entered','Unique','Clipboard unavailable; use Ctrl+V.'],
-ru:['Убрать повторы','Копировать DTC','DTC TXT','Вставить DTC','Введено','Уникальных','Используйте Ctrl+V.'],
-fr:['Supprimer les doublons','Copier DTC','DTC TXT','Coller DTC','Saisis','Uniques','Utilisez Ctrl+V.'],
-es:['Eliminar duplicados','Copiar DTC','DTC TXT','Pegar DTC','Introducidos','Únicos','Usa Ctrl+V.']};
+lv:['Noņemt dublikātus','Kopēt DTC kodus','Lejupielādēt DTC TXT','Ielīmēt DTC kodus','Ievadīti','Unikālie','Starpliktuve nav pieejama. Izmanto Ctrl+V.'],
+en:['Remove duplicates','Copy DTC codes','Download DTC TXT','Paste DTC codes','Entered','Unique','Clipboard unavailable. Use Ctrl+V.'],
+ru:['Убрать повторы','Копировать коды DTC','Скачать DTC TXT','Вставить коды DTC','Введено','Уникальных','Используйте Ctrl+V.'],
+fr:['Supprimer les doublons','Copier les codes DTC','Télécharger DTC TXT','Coller les codes DTC','Saisis','Uniques','Utilisez Ctrl+V.'],
+es:['Eliminar duplicados','Copiar códigos DTC','Descargar DTC TXT','Pegar códigos DTC','Introducidos','Únicos','Usa Ctrl+V.']};
 function init(){
-const input=document.getElementById('multi-dtc-input');
-if(!input)return;
+const input=document.getElementById('multi-dtc-input');if(!input)return;
 const lang=document.getElementById('lang');
-const w=()=>translations[lang?.value]||translations.lv;
-const parse=()=>input.value.toUpperCase().match(/[A-Z][0-9A-Z]{4}(?:-[0-9A-F]{2})?/g)||[];
-const unique=()=>[...new Set(parse())];
+const words=()=>translations[(lang&&lang.value)||'lv']||translations.lv;
+const codes=()=>input.value.toUpperCase().match(/[A-Z][0-9A-Z]{4}(?:-[0-9A-F]{2})?/g)||[];
+const unique=()=>[...new Set(codes())];
 const bar=document.createElement('div');bar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin:8px 0';
-const buttons=Array.from({length:4},()=>{const b=document.createElement('button');b.type='button';bar.append(b);return b;});
-const count=document.createElement('div');count.setAttribute('role','status');
+const buttons=Array.from({length:4},()=>{const b=document.createElement('button');b.type='button';bar.appendChild(b);return b;});
+const count=document.createElement('div');count.setAttribute('role','status');count.style.margin='6px 0';
 const feedback=document.createElement('span');feedback.setAttribute('role','status');
-input.insertAdjacentElement('afterend',bar);bar.after(count,feedback);
-function refresh(){buttons.forEach((b,i)=>b.textContent=w()[i]);count.textContent=w()[4]+': '+parse().length+' · '+w()[5]+': '+unique().length;}
+input.insertAdjacentElement('afterend',bar);bar.insertAdjacentElement('afterend',count);count.insertAdjacentElement('afterend',feedback);
+function refresh(){buttons.forEach((b,i)=>b.textContent=words()[i]);count.textContent=words()[4]+': '+codes().length+' · '+words()[5]+': '+unique().length;}
 buttons[0].addEventListener('click',()=>{input.value=unique().join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();});
-buttons[1].addEventListener('click',async()=>{try{await navigator.clipboard.writeText(unique().join(', '));feedback.textContent='✓';}catch(e){input.focus();input.select();feedback.textContent=w()[6];}});
-buttons[2].addEventListener('click',()=>{const blob=new Blob([unique().join('\r\n')+'\r\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_DTC.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-buttons[3].addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();input.value=[input.value.trim(),t.trim()].filter(Boolean).join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();}catch(e){input.focus();feedback.textContent=w()[6];}});
-input.addEventListener('input',refresh);lang?.addEventListener('change',refresh);refresh();
+buttons[1].addEventListener('click',async()=>{try{await navigator.clipboard.writeText(unique().join(', '));feedback.textContent='✓';}catch(e){input.focus();input.select();feedback.textContent=words()[6];}});
+buttons[2].addEventListener('click',()=>{const blob=new Blob([unique().join('\r\n')+'\r\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_DTC_kodi.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+buttons[3].addEventListener('click',async()=>{try{const text=await navigator.clipboard.readText();input.value=[input.value.trim(),text.trim()].filter(Boolean).join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();}catch(e){input.focus();feedback.textContent=words()[6];}});
+input.addEventListener('input',refresh);if(lang)lang.addEventListener('change',refresh);refresh();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
