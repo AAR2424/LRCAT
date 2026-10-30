@@ -115,8 +115,6 @@ main{padding:12px;max-width:950px;margin:auto}
  <p id="vhs-note" style="font-size:12px;opacity:.8">Atskaišu skaits un pēdējās diagnostikas datums katrai saglabātajai automašīnai.</p>
  <label for="vhs-search" id="vhs-search-label">Meklēt automašīnu</label> <input id="vhs-search" type="search" autocomplete="off" placeholder="VIN, reģistrācijas numurs vai klients" style="width:min(100%,340px);margin:6px 8px 6px 0">
  <span id="vhs-count" role="status" aria-live="polite" style="font-size:12px;opacity:.8"></span><br>
- <label for="vhs-filter" id="vhs-filter-label">Rādīt automašīnas</label> <select id="vhs-filter" aria-label="Filtrēt automašīnas pēc atskaišu esamības"><option value="all">Visas automašīnas</option><option value="with">Ar atskaitēm</option><option value="without">Bez atskaitēm</option></select><br>
- <button id="vhs-reset" type="button" style="margin:6px 8px 6px 0">Atiestatīt filtrus</button>
  <label for="vhs-sort" id="vhs-sort-label">Kārtot pēc</label> <select id="vhs-sort"><option value="latest-desc">Pēdējā diagnostika (jaunākā)</option><option value="latest-asc">Pēdējā diagnostika (vecākā)</option><option value="count-desc">Atskaišu skaits (vairāk)</option><option value="count-asc">Atskaišu skaits (mazāk)</option><option value="name-asc">Automašīnas nosaukums (A–Z)</option></select>
  <div id="vhs-list" style="display:grid;gap:8px"></div>
 </section>
@@ -710,37 +708,18 @@ const vehicleSummarySearchI18n={
  fr:['Rechercher un véhicule','VIN, immatriculation ou client','Résultats : {shown} sur {total}'],
  es:['Buscar vehículos','VIN, matrícula o cliente','Encontrados: {shown} de {total}']
 };
-const vehicleSummaryFilterI18n={
- lv:['Rādīt automašīnas','Visas automašīnas','Ar atskaitēm','Bez atskaitēm'],
- en:['Show vehicles','All vehicles','With reports','Without reports'],
- ru:['Показать автомобили','Все автомобили','С отчётами','Без отчётов'],
- fr:['Afficher les véhicules','Tous les véhicules','Avec rapports','Sans rapports'],
- es:['Mostrar vehículos','Todos los vehículos','Con informes','Sin informes']
-};
-const vehicleSummaryResetI18n={lv:'Atiestatīt filtrus',en:'Reset filters',ru:'Сбросить фильтры',fr:'Réinitialiser les filtres',es:'Restablecer filtros'};
-document.getElementById('vhs-reset').addEventListener('click',()=>{
- document.getElementById('vhs-search').value='';
- document.getElementById('vhs-filter').value='all';
- document.getElementById('vhs-sort').value='latest-desc';
- renderVehicleHistorySummary();
-});
-document.getElementById('vhs-filter').addEventListener('change',renderVehicleHistorySummary);
 document.getElementById('vhs-search').addEventListener('input',renderVehicleHistorySummary);
 document.getElementById('vhs-sort').addEventListener('change',renderVehicleHistorySummary);
 function renderVehicleHistorySummary(){
  const t=vehicleSummaryI18n[langSelect.value]||vehicleSummaryI18n.lv;
  const st=vehicleSummarySortI18n[langSelect.value]||vehicleSummarySortI18n.lv;
  document.getElementById('vhs-title').textContent=t[0];
- document.getElementById('vhs-reset').textContent=vehicleSummaryResetI18n[langSelect.value]||vehicleSummaryResetI18n.lv;
  document.getElementById('vhs-note').textContent=t[1];
  document.getElementById('vhs-sort-label').textContent=st[0];
  [...document.getElementById('vhs-sort').options].forEach((option,i)=>option.textContent=st[i+1]);
  const searchText=vehicleSummarySearchI18n[langSelect.value]||vehicleSummarySearchI18n.lv;
  document.getElementById('vhs-search-label').textContent=searchText[0];
  document.getElementById('vhs-search').placeholder=searchText[1];
- const ft=vehicleSummaryFilterI18n[langSelect.value]||vehicleSummaryFilterI18n.lv;
- document.getElementById('vhs-filter-label').textContent=ft[0];
- [...document.getElementById('vhs-filter').options].forEach((option,i)=>option.textContent=ft[i+1]);
  const list=document.getElementById('vhs-list');list.replaceChildren();
  const profiles=vehicleHistoryProfiles(),reports=readHistory();
  const query=document.getElementById('vhs-search').value.trim().toLocaleLowerCase();
@@ -748,26 +727,23 @@ function renderVehicleHistorySummary(){
   const data=profile.data||{};
   return !query||[profile.name,data['report-vin'],data['report-plate'],data['report-client']].some(value=>String(value||'').toLocaleLowerCase().includes(query));
  });
-
+ document.getElementById('vhs-count').textContent=searchText[2].replace('{shown}',String(visibleProfiles.length)).replace('{total}',String(profiles.length));
  if(!profiles.length){const p=document.createElement('p');p.textContent=t[5];list.appendChild(p);return;}
  const rows=visibleProfiles.map(profile=>{
   const matches=reports.filter(item=>vehicleMatchesReport(item,profile));
   const dates=matches.map(item=>Date.parse(item.savedAt)).filter(Number.isFinite);
   return {profile,count:matches.length,last:dates.length?Math.max(...dates):null,name:String(profile.name||profile.data['report-plate']||profile.data['report-vin']||profile.id)};
  });
- const filter=document.getElementById('vhs-filter').value;
- const filteredRows=rows.filter(row=>filter==='with'?row.count>0:filter==='without'?row.count===0:true);
- document.getElementById('vhs-count').textContent=searchText[2].replace('{shown}',String(filteredRows.length)).replace('{total}',String(profiles.length));
  const sort=document.getElementById('vhs-sort').value;
  const byName=(a,b)=>a.name.localeCompare(b.name,langSelect.value,{sensitivity:'base'});
- filteredRows.sort((a,b)=>{
+ rows.sort((a,b)=>{
   if(sort==='count-desc')return b.count-a.count||byName(a,b);
   if(sort==='count-asc')return a.count-b.count||byName(a,b);
   if(sort==='latest-asc')return (a.last===null?Infinity:a.last)-(b.last===null?Infinity:b.last)||byName(a,b);
   if(sort==='name-asc')return byName(a,b);
   return (b.last===null?-Infinity:b.last)-(a.last===null?-Infinity:a.last)||byName(a,b);
  });
- filteredRows.forEach(({profile,count,last,name})=>{
+ rows.forEach(({profile,count,last,name})=>{
   const latest=last!==null?new Date(last).toLocaleDateString(langSelect.value):t[4];
   const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:9px;border:1px solid #aaa5;border-radius:7px';
   const info=document.createElement('span');info.style.flex='1 1 230px';
