@@ -527,40 +527,7 @@ function saveReportHtml(){
  const labels=previewSaveLabels[langSelect.value]||previewSaveLabels.lv;
  if(!window.confirm(labels[1]))return;
  const title='LRCAT 10.3 — '+(document.getElementById('report-number')?.value.trim()||'diagnostikas_atskaite');
- const html='<!doctype html><html lang="'+(langSelect.value||'lv')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+esc(title)+'</title><style>@page{size:A4;margin:16mm}body{max-width:850px;margin:25px auto;padding:20px;color:#111;background:white;font:14px/1.5 Arial,sans-serif}h1{font-size:24px}h2{font-size:19px}.print-row{padding:6px 0;border-bottom:1px solid #ddd;overflow-wrap:anywhere}.print-label{font-weight:bold}.combined-entry{border-top:1px solid #aaa;margin-top:22px;padding-top:12px;break-inside:avoid-page}.print-disclaimer{border-top:1px solid #888;margin-top:22px;padding-top:12px;font-size:12px}.print-recommendations{border-top:1px solid #aaa;margin-top:12px;padding-top:8px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px;text-align:left}@media print{body{margin:0;padding:0}}</style></head><body>'+report.innerHTML+'
-<script>
-/* LRCAT 10.3 — isolated multi-DTC tools */
-(function(){
-'use strict';
-const translations={
-lv:['Noņemt dublikātus','Kopēt DTC kodus','DTC TXT','Ielīmēt DTC kodus','Ievadīti','Unikālie','Starpliktuve nav pieejama; izmanto Ctrl+V.'],
-en:['Remove duplicates','Copy DTC codes','DTC TXT','Paste DTC codes','Entered','Unique','Clipboard unavailable; use Ctrl+V.'],
-ru:['Убрать повторы','Копировать DTC','DTC TXT','Вставить DTC','Введено','Уникальных','Используйте Ctrl+V.'],
-fr:['Supprimer les doublons','Copier DTC','DTC TXT','Coller DTC','Saisis','Uniques','Utilisez Ctrl+V.'],
-es:['Eliminar duplicados','Copiar DTC','DTC TXT','Pegar DTC','Introducidos','Únicos','Usa Ctrl+V.']};
-function init(){
-const input=document.getElementById('multi-dtc-input');
-if(!input)return;
-const lang=document.getElementById('lang');
-const w=()=>translations[lang?.value]||translations.lv;
-const parse=()=>input.value.toUpperCase().match(/[A-Z][0-9A-Z]{4}(?:-[0-9A-F]{2})?/g)||[];
-const unique=()=>[...new Set(parse())];
-const bar=document.createElement('div');bar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin:8px 0';
-const buttons=Array.from({length:4},()=>{const b=document.createElement('button');b.type='button';bar.append(b);return b;});
-const count=document.createElement('div');count.setAttribute('role','status');
-const feedback=document.createElement('span');feedback.setAttribute('role','status');
-input.insertAdjacentElement('afterend',bar);bar.after(count,feedback);
-function refresh(){buttons.forEach((b,i)=>b.textContent=w()[i]);count.textContent=w()[4]+': '+parse().length+' · '+w()[5]+': '+unique().length;}
-buttons[0].addEventListener('click',()=>{input.value=unique().join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();});
-buttons[1].addEventListener('click',async()=>{try{await navigator.clipboard.writeText(unique().join(', '));feedback.textContent='✓';}catch(e){input.focus();input.select();feedback.textContent=w()[6];}});
-buttons[2].addEventListener('click',()=>{const blob=new Blob([unique().join('\r\n')+'\r\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_DTC.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-buttons[3].addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();input.value=[input.value.trim(),t.trim()].filter(Boolean).join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();}catch(e){input.focus();feedback.textContent=w()[6];}});
-input.addEventListener('input',refresh);lang?.addEventListener('change',refresh);refresh();
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
-</body></html>';
+ const html='<!doctype html><html lang="'+(langSelect.value||'lv')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+esc(title)+'</title><style>@page{size:A4;margin:16mm}body{max-width:850px;margin:25px auto;padding:20px;color:#111;background:white;font:14px/1.5 Arial,sans-serif}h1{font-size:24px}h2{font-size:19px}.print-row{padding:6px 0;border-bottom:1px solid #ddd;overflow-wrap:anywhere}.print-label{font-weight:bold}.combined-entry{border-top:1px solid #aaa;margin-top:22px;padding-top:12px;break-inside:avoid-page}.print-disclaimer{border-top:1px solid #888;margin-top:22px;padding-top:12px;font-size:12px}.print-recommendations{border-top:1px solid #aaa;margin-top:12px;padding-top:8px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px;text-align:left}@media print{body{margin:0;padding:0}}</style></head><body>'+report.innerHTML+'</body></html>';
  const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='LRCAT_8_2_atskaite_'+new Date().toISOString().slice(0,10)+'.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
@@ -1159,40 +1126,7 @@ updateHistoryFilterSummary();
    if(!confirm(t()[2]))return;
    const words=t();
    const rows=items.map((p,i)=>'<tr><td>'+String(i+1)+'</td>'+['report-vin','report-plate','report-client','report-mileage'].map(k=>'<td>'+esc(String(p.data[k]??'').slice(0,120))+'</td>').join('')+'</tr>').join('');
-   const html='<!doctype html><html lang="'+esc(lang())+'"><head><meta charset="utf-8"><title>'+esc(words[3])+'</title><style>body{font:14px system-ui,Arial,sans-serif;margin:28px;color:#17212b}h1{font-size:22px}table{border-collapse:collapse;width:100%;margin-top:18px}th,td{border:1px solid #aeb9c2;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf2f5}@media print{body{margin:10mm}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><h1>'+esc(words[3])+'</h1><p>'+esc(words[8])+': '+esc(new Date().toLocaleString(lang()))+' · '+items.length+'</p><table><thead><tr><th>#</th>'+words.slice(4,8).map(w=>'<th>'+esc(w)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table>
-<script>
-/* LRCAT 10.3 — isolated multi-DTC tools */
-(function(){
-'use strict';
-const translations={
-lv:['Noņemt dublikātus','Kopēt DTC kodus','DTC TXT','Ielīmēt DTC kodus','Ievadīti','Unikālie','Starpliktuve nav pieejama; izmanto Ctrl+V.'],
-en:['Remove duplicates','Copy DTC codes','DTC TXT','Paste DTC codes','Entered','Unique','Clipboard unavailable; use Ctrl+V.'],
-ru:['Убрать повторы','Копировать DTC','DTC TXT','Вставить DTC','Введено','Уникальных','Используйте Ctrl+V.'],
-fr:['Supprimer les doublons','Copier DTC','DTC TXT','Coller DTC','Saisis','Uniques','Utilisez Ctrl+V.'],
-es:['Eliminar duplicados','Copiar DTC','DTC TXT','Pegar DTC','Introducidos','Únicos','Usa Ctrl+V.']};
-function init(){
-const input=document.getElementById('multi-dtc-input');
-if(!input)return;
-const lang=document.getElementById('lang');
-const w=()=>translations[lang?.value]||translations.lv;
-const parse=()=>input.value.toUpperCase().match(/[A-Z][0-9A-Z]{4}(?:-[0-9A-F]{2})?/g)||[];
-const unique=()=>[...new Set(parse())];
-const bar=document.createElement('div');bar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin:8px 0';
-const buttons=Array.from({length:4},()=>{const b=document.createElement('button');b.type='button';bar.append(b);return b;});
-const count=document.createElement('div');count.setAttribute('role','status');
-const feedback=document.createElement('span');feedback.setAttribute('role','status');
-input.insertAdjacentElement('afterend',bar);bar.after(count,feedback);
-function refresh(){buttons.forEach((b,i)=>b.textContent=w()[i]);count.textContent=w()[4]+': '+parse().length+' · '+w()[5]+': '+unique().length;}
-buttons[0].addEventListener('click',()=>{input.value=unique().join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();});
-buttons[1].addEventListener('click',async()=>{try{await navigator.clipboard.writeText(unique().join(', '));feedback.textContent='✓';}catch(e){input.focus();input.select();feedback.textContent=w()[6];}});
-buttons[2].addEventListener('click',()=>{const blob=new Blob([unique().join('\r\n')+'\r\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_DTC.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-buttons[3].addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();input.value=[input.value.trim(),t.trim()].filter(Boolean).join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();}catch(e){input.focus();feedback.textContent=w()[6];}});
-input.addEventListener('input',refresh);lang?.addEventListener('change',refresh);refresh();
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
-</body></html>';
+   const html='<!doctype html><html lang="'+esc(lang())+'"><head><meta charset="utf-8"><title>'+esc(words[3])+'</title><style>body{font:14px system-ui,Arial,sans-serif;margin:28px;color:#17212b}h1{font-size:22px}table{border-collapse:collapse;width:100%;margin-top:18px}th,td{border:1px solid #aeb9c2;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf2f5}@media print{body{margin:10mm}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><h1>'+esc(words[3])+'</h1><p>'+esc(words[8])+': '+esc(new Date().toLocaleString(lang()))+' · '+items.length+'</p><table><thead><tr><th>#</th>'+words.slice(4,8).map(w=>'<th>'+esc(w)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></body></html>';
    const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
    a.href=url;a.download='LRCAT_8_8_automasinu_saraksts.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(e){alert(t()[9]);}
@@ -1227,40 +1161,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
    if(!confirm(t()[2]))return;
    const words=t(),rows=items.map((p,i)=>'<tr><td>'+(i+1)+'</td>'+['report-vin','report-plate','report-client','report-mileage'].map(k=>'<td>'+esc(String(p.data[k]??'').slice(0,120))+'</td>').join('')+'</tr>').join('');
    const meta=esc(words[8])+': '+esc(new Date().toLocaleString(locale()))+' · '+items.length+(query?' · '+esc(words[10])+': '+esc(query):'');
-   const html='<!doctype html><html lang="'+esc(locale())+'"><head><meta charset="utf-8"><title>'+esc(words[3])+'</title><style>body{font:14px system-ui,Arial,sans-serif;margin:28px;color:#17212b}h1{font-size:22px}table{border-collapse:collapse;width:100%;margin-top:18px}th,td{border:1px solid #aeb9c2;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf2f5}@media print{body{margin:10mm}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><h1>'+esc(words[3])+'</h1><p>'+meta+'</p><table><thead><tr><th>#</th>'+words.slice(4,8).map(w=>'<th>'+esc(w)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table>
-<script>
-/* LRCAT 10.3 — isolated multi-DTC tools */
-(function(){
-'use strict';
-const translations={
-lv:['Noņemt dublikātus','Kopēt DTC kodus','DTC TXT','Ielīmēt DTC kodus','Ievadīti','Unikālie','Starpliktuve nav pieejama; izmanto Ctrl+V.'],
-en:['Remove duplicates','Copy DTC codes','DTC TXT','Paste DTC codes','Entered','Unique','Clipboard unavailable; use Ctrl+V.'],
-ru:['Убрать повторы','Копировать DTC','DTC TXT','Вставить DTC','Введено','Уникальных','Используйте Ctrl+V.'],
-fr:['Supprimer les doublons','Copier DTC','DTC TXT','Coller DTC','Saisis','Uniques','Utilisez Ctrl+V.'],
-es:['Eliminar duplicados','Copiar DTC','DTC TXT','Pegar DTC','Introducidos','Únicos','Usa Ctrl+V.']};
-function init(){
-const input=document.getElementById('multi-dtc-input');
-if(!input)return;
-const lang=document.getElementById('lang');
-const w=()=>translations[lang?.value]||translations.lv;
-const parse=()=>input.value.toUpperCase().match(/[A-Z][0-9A-Z]{4}(?:-[0-9A-F]{2})?/g)||[];
-const unique=()=>[...new Set(parse())];
-const bar=document.createElement('div');bar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin:8px 0';
-const buttons=Array.from({length:4},()=>{const b=document.createElement('button');b.type='button';bar.append(b);return b;});
-const count=document.createElement('div');count.setAttribute('role','status');
-const feedback=document.createElement('span');feedback.setAttribute('role','status');
-input.insertAdjacentElement('afterend',bar);bar.after(count,feedback);
-function refresh(){buttons.forEach((b,i)=>b.textContent=w()[i]);count.textContent=w()[4]+': '+parse().length+' · '+w()[5]+': '+unique().length;}
-buttons[0].addEventListener('click',()=>{input.value=unique().join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();});
-buttons[1].addEventListener('click',async()=>{try{await navigator.clipboard.writeText(unique().join(', '));feedback.textContent='✓';}catch(e){input.focus();input.select();feedback.textContent=w()[6];}});
-buttons[2].addEventListener('click',()=>{const blob=new Blob([unique().join('\r\n')+'\r\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LRCAT_DTC.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-buttons[3].addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();input.value=[input.value.trim(),t.trim()].filter(Boolean).join(', ');input.dispatchEvent(new Event('input',{bubbles:true}));refresh();}catch(e){input.focus();feedback.textContent=w()[6];}});
-input.addEventListener('input',refresh);lang?.addEventListener('change',refresh);refresh();
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
-</body></html>';
+   const html='<!doctype html><html lang="'+esc(locale())+'"><head><meta charset="utf-8"><title>'+esc(words[3])+'</title><style>body{font:14px system-ui,Arial,sans-serif;margin:28px;color:#17212b}h1{font-size:22px}table{border-collapse:collapse;width:100%;margin-top:18px}th,td{border:1px solid #aeb9c2;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf2f5}@media print{body{margin:10mm}thead{display:table-header-group}tr{break-inside:avoid}}</style></head><body><h1>'+esc(words[3])+'</h1><p>'+meta+'</p><table><thead><tr><th>#</th>'+words.slice(4,8).map(w=>'<th>'+esc(w)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></body></html>';
    const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='LRCAT_8_8_atlasitie_profili.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(e){alert(t()[9]);}
  });
@@ -1305,7 +1206,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  });
 })();
 </script>
-
 
 <script>
 /* LRCAT 10.3 — isolated multi-DTC tools */
